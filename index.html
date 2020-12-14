@@ -50,6 +50,27 @@
             axios.post('/api/login', data)
             .then(res => {
                 console.log(res);
+                document.getElementById('username').value='';
+                document.getElementById('password').value='';
+                if (res && res.data && res.data.success) {
+                    const token = res.data.token;
+                    localStorage.setItem('jwt', token);
+                    getDashboard();
+                }
+            });
+        }
+
+        function getDashboard() {
+            const token = localStorage.getItem('jwt');
+            axios.get('/api/dashboard', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }).then(res => {
+                if (res && res.data && res.data.success) {
+                    document.querySelector('h1.row').innerHTML = 'Dashboard';
+                    document.querySelector('main').innerHTML = res.data.myContent;
+                }
             });
         }
         </script>

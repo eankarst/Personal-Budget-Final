@@ -2,14 +2,25 @@ const express = require('express');
 const app = express();
 
 const jwt = require('jsonwebtoken');
+const exjwt = require('express-jwt');
 const bodyParser = require('body-parser');
 const path = require('path');
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-type, Authorization');
+    next();
+});
 
 const PORT = 3000;
 
 const secretKey = 'My super secret key';
+const jwtMW = exjwt({
+    secret: secretKey,
+    algorithms: ['HS256']
+});
 
 let users = [
     {
@@ -47,8 +58,28 @@ app.post('/api/login', (req, res) => {
     }
 });
 
+app.get('/api/dashboard', jwtMW, (req, res) => {
+    res.json({
+        success: true,
+        myContent: 'Secret content that only logged in people can see.'
+    });
+});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.use(function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).json({
+            success: false,
+            officialError: err,
+            err: 'You must be logged in to view this page'
+        });
+    }
+    else {
+        next(err);
+    }
 });
 
 app.listen(PORT, () => {
