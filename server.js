@@ -6,6 +6,14 @@ const exjwt = require('express-jwt');
 const bodyParser = require('body-parser');
 const path = require('path');
 
+const connectDB = require('./DB/Connection');
+connectDB();
+
+app.use(express.json({ extended:false }));
+app.use('/api/userModel', require('./Api/User'));
+
+//const mongoose = require('mongoose');
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use((req, res, next) => {
@@ -22,18 +30,36 @@ const jwtMW = exjwt({
     algorithms: ['HS256']
 });
 
-let users = [
-    {
-        id: 1,
-        username: 'fabio',
-        password: '123'
-    },
-    {
-        id: 2,
-        username: 'nolasco',
-        password: '456'
-    }
-];
+// let users = [
+//     {
+//         id: 1,
+//         username: 'fabio',
+//         password: '123'
+//     },
+//     {
+//         id: 2,
+//         username: 'nolasco',
+//         password: '456'
+//     }
+// ];
+
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(()=>{
+    console.log("Connected to the database")
+    budgetModel.find({})
+      .then((data)=>{
+        console.log("Got Here in /budget");
+        res.json(data);
+        mongoose.connection.close()
+        console.log("Closed the connection in /budget");
+      })
+      .catch((connectionError)=>{
+        console.log(connectionError)
+      })
+  })
+  .catch((connectionError)=> {
+    console.log(connectionError)
+  });
 
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;

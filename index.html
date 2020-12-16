@@ -1,79 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-      crossorigin="anonymous"
-    />
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"
-      integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg=="
-      crossorigin="anonymous"
-    ></script>
+    <title>Personal Budget Manager</title>
+    <link rel="stylesheet" href="/main.css" type="text/css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"
+        integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg=="
+        crossorigin="anonymous"></script>
 </head>
+
 <body>
+
+    <nav>
+        <h1>Personal Budget Manager</h1>
+        <ul>
+            <li><button class="navButton" onclick="homeDisplay()">Home</button></li>
+            <li><button class="navButton" onclick="getDashboard()">Dashboard</button></li>
+            <li><button class="navButton" onclick="loginDisplay()">Login</button></li>
+            <li><button class="navButton" onclick="registerDisplay()">Register</button></li>
+        </ul>
+    </nav>
 
     <div class="container-fluid">
 
-        <h1 class="row">Login</h1>
+        <h1 class="row">Welcome!</h1>
 
         <main>
 
-            <div class="row">
-                <label for='username'>Username</label>
-                <input type="text" name="username" id="username">
-            </div>
-
-            <div class="row">
-                <label for="password">password</label>
-                <input type="password" name="password" id="password">
-            </div>
-
-            <div>
-                <button onclick="login()">Login</button>
-            </div>
+            <p>Personal Budget Manager is the best tool to create, track, and manage your personal budget!</p>
+            <p>Login or register for free to get started!</p>
 
         </main>
-    
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js" integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg==" crossorigin="anonymous"></script>
         <script>
+
+            function homeDisplay() {
+                document.querySelector('h1.row').innerHTML = 'Welcome!';
+                document.querySelector('main').innerHTML = '<p>Personal Budget Manager is the best tool to create, track, and manage your personal budget!</p>';
+                document.querySelector('main').innerHTML += '<p>Login or register for free to get started!</p>'
+            };
+
+            function loginDisplay() {
+                document.querySelector('h1.row').innerHTML = 'Login';
+                document.querySelector('main').innerHTML = '<div class="row"><label for="username">Username </label><input type="text" name="username" id="username"></div><div class="row"><label for="password">Password </label><input type="password" name="password" id="password"></div><div><button onclick="login()">Login</button></div>';
+            };
+
+            function registerDisplay() {
+                document.querySelector('h1.row').innerHTML = 'Register';
+                document.querySelector('main').innerHTML = '<div class="row"><label for="username">Username </label><input type="text" name="username" id="username"></div><div class="row"><label for="email">Email </label><input type="email" name="email" id="email"></div><div class="row"><label for="password">Password</label><input type="password" name="password" id="password"></div><div><button onclick="register()">Register</button></div>';
+            };
+
+            function register() {
+                const data = {
+                    username: document.getElementById('username').value,
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value,
+                };
+                axios.post('/api/register', data)
+                    .then(res => {
+                        if (res.status == 200) {
+                            console.log('Success')
+                            document.getElementById('username').value = '';
+                            document.getElementById('email').value = '';
+                            document.getElementById('password').value = '';
+                            loginDisplay();
+                        } else {
+                            console.log("There was an error."); 
+                        }                               
+                    });
+            }
 
             function login() {
                 const data = {
-                username: document.getElementById('username').value,
-                password: document.getElementById('password').value,
-            };
-            axios.post('/api/login', data)
-            .then(res => {
-                console.log(res);
-                document.getElementById('username').value='';
-                document.getElementById('password').value='';
-                if (res && res.data && res.data.success) {
-                    const token = res.data.token;
-                    localStorage.setItem('jwt', token);
-                    getDashboard();
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value,
+                };
+                axios.post('/api/login', data)
+                    .then(res => {
+                        //console.log(res);
+                        document.getElementById('username').value = '';
+                        document.getElementById('password').value = '';
+                        if (res && res.data && res.data.success) {
+                            const token = res.data.token;
+                            localStorage.setItem('jwt', token);
+                            getDashboard();
+                        }
+                    });
+            }
+
+            function displayDashboard() {
+                return `
+                <h2>Test</h1>
+                `;
+            }
+
+            function getDashboard() {
+                const token = localStorage.getItem('jwt');
+                axios.get('/api/dashboard', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then(res => {
+                    if (res && res.data && res.data.success) {
+                        document.querySelector('h1.row').innerHTML = 'Dashboard';
+                        document.querySelector('main').innerHTML = displayDashboard();
+                    }
+                });
+            }
+            var dataSource = {
+            datasets: [
+                {
+                    data: [],
+                    backgroundColor: [
+                        '#ffcd56',
+                        '#ff6384',
+                        '#36a2eb',
+                        '#fd6b19',
+                        '#812abc',
+                        '#ef87ba',
+                        '#a7de09',
+                    ],
                 }
+            ],
+            labels: []
+        };
+
+        function createChart() {
+            var ctx = document.getElementById("myChart").getContext("2d");
+            var myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: dataSource
             });
         }
 
-        function getDashboard() {
-            const token = localStorage.getItem('jwt');
-            axios.get('/api/dashboard', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+        function getBudget() {
+            axios.get('http://localhost:3000')
+            .then(function (res) {
+                console.log(res);
+                for (var i = 0; i < res.data.length; i++) {
+                    dataSource.datasets[0].data[i] = res.data[i].relatedValue;
+                    dataSource.labels[i] = res.data[i].title;
+                    dataSource.datasets[0].backgroundColor[i] = res.data[i].color;
                 }
-            }).then(res => {
-                if (res && res.data && res.data.success) {
-                    document.querySelector('h1.row').innerHTML = 'Dashboard';
-                    document.querySelector('main').innerHTML = res.data.myContent;
-                }
+                createChart();
             });
         }
+        getBudget();
         </script>
 
 </body>
+
 </html>
