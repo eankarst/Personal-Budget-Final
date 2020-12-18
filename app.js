@@ -182,6 +182,21 @@ app.post('/api/createEmptyBudget', (req, res )=> {
         
 });
 
+app.post('/api/addCategory', (req, res) => {
+    const { category } = req.body;
+    db.query('ALTER TABLE budget ADD COLUMN ' + category + ' VARCHAR(255)', (error, results) => {
+        if(error) {
+            console.log(error);
+        } else {
+            res.json({
+                success: true,
+                err: null
+            });
+            console.log("Category added");               
+        }
+    });
+});
+
 app.post('/api/addValue', (req, res) => {
     const { category, amount, month } = req.body;
     db.query('UPDATE budget SET ' + category + ' = ? WHERE username = ? AND month = ?', [amount, currentUsername, month], (error, results) => {
@@ -193,7 +208,6 @@ app.post('/api/addValue', (req, res) => {
                 err: null
             });
             console.log("Value added");               
-            //createEmptyBudget(username);
         }
     });
 });
