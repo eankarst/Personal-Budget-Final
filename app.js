@@ -14,6 +14,8 @@ const jwtMW = exjwt({
     algorithms: ['HS256']
 });
 
+var currentUsername = '';
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Headers', 'Content-type, Authorization');
@@ -29,7 +31,7 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'final-login'
+    database: 'final'
 });
 
 db.connect( (error) => {
@@ -68,6 +70,7 @@ app.post('/api/login', (req, res) => {
                 const id = results[0].id;
                 const token = jwt.sign({ id }, secretKey, { expiresIn: '7d' });
                 console.log('Got Here 4');
+                currentUsername = username;
                 res.status(200).json({
                     success: true,
                     err: null,
@@ -124,7 +127,8 @@ app.post('/api/register', (req, res) => {
                     success: true,
                     err: null
                 });
-                console.log("User Registered");
+                console.log("User Registered");               
+                //createEmptyBudget(username);
             }
         })
         //db.end;
@@ -138,6 +142,85 @@ app.post('/api/register', (req, res) => {
 return res;
 
 });
+
+function createEmptyBudget(username) {
+    const name = username;
+    console.log("Got to createEmptyBudget");
+    db.query('INSERT INTO budget SET ?', {username: name, jan: '0', feb: '0', mar: '0', apr: '0', may: '0', jun: '0', jul: '0', aug: '0', sep: '0', oct: '0', nov: '0', december: '0',}, (error, results) => {
+        if(error) {
+            console.log(error);
+        } else {
+            res.json({
+                success: true,
+                err: null
+            });
+            console.log("Empty Budget Created.")
+        }
+    })
+}
+
+app.post('/api/createEmptyBudget', (req, res )=> {
+    console.log("Got to empty Budget");
+    // const { username } = req.body;
+    // console.log("Username: " + username);
+    db.query('SELECT id FROM users WHERE name = ?', [username], (error, results) => {
+        idOfUser = results[0].id;
+        console.log("UserID: " + idOfUser);
+    });
+    db.query('INSERT INTO budget SET ?', {userID: idOfUser, jan: '0', feb: '0', mar: '0', apr: '0', may: '0', jun: '0', jul: '0', aug: '0', sep: '0', oct: '0', nov: '0', december: '0',}, (error, results) => {
+        if(error) {
+            console.log(error);
+        } else {
+            res.json({
+                success: true,
+                err: null
+            });
+            console.log("Empty Budget Created.")
+        }
+    })
+    return res;
+        
+});
+
+app.post('/api/budget', (req, res) => {
+    console.log("currentUsername: " + currentUsername);
+    // userBudget();
+    // console.log(res.json);
+    db.query('SELECT * FROM budget where username = ?', [currentUsername], (error, results) => {
+        if(error) {
+            console.log(error);
+            return;
+        } else {
+            console.log(currentUsername);
+            console.log("Accessing budget table...");
+            console.log(results);
+            res.json(results);
+        }
+    });
+    // var budget = await db.query('SELECT * FROM budget where username = ?', [currentUsername], (error, results) => {
+    //     if(error) {
+    //         console.log(error);
+    //         return;
+    //     }
+    // });
+    //     console.log("Accessing budget table");
+    //     console.log("req.body: " + req.body);
+});
+
+async function userBudget(err, req, res, next) {
+    var budget = await db.query('SELECT * FROM budget where username = ?', [currentUsername], (error, results) => {
+        if(error) {
+            console.log(error);
+            return;
+        } else {
+            console.log(currentUsername);
+            console.log("Accessing budget table...");
+            console.log(results);
+            return results;
+        }
+    });
+    
+};
 
 app.get('/api/dashboard', jwtMW, (req, res) => {
     res.json({

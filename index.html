@@ -6,11 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Budget Manager</title>
     <link rel="stylesheet" href="/main.css" type="text/css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"
         integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg=="
         crossorigin="anonymous"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 </head>
 
 <body>
@@ -34,10 +38,18 @@
             <p>Personal Budget Manager is the best tool to create, track, and manage your personal budget!</p>
             <p>Login or register for free to get started!</p>
 
+
+
+
+
         </main>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js" integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg==" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"
+            integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg=="
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"
+            integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg=="
+            crossorigin="anonymous"></script>
         <script>
 
             function homeDisplay() {
@@ -66,13 +78,18 @@
                     .then(res => {
                         if (res.status == 200) {
                             console.log('Success')
+                            // axios.post('/api/createEmptyBudget', data).then(res => {
                             document.getElementById('username').value = '';
                             document.getElementById('email').value = '';
                             document.getElementById('password').value = '';
                             loginDisplay();
+                            //})
+
+
+
                         } else {
-                            console.log("There was an error."); 
-                        }                               
+                            console.log("There was an error.");
+                        }
                     });
             }
 
@@ -96,11 +113,12 @@
 
             function displayDashboard() {
                 return `
-                <h2>Test</h1>
+                <h2>Test</h2>
+                
                 `;
             }
 
-            function getDashboard() {
+            async function getDashboard() {
                 const token = localStorage.getItem('jwt');
                 axios.get('/api/dashboard', {
                     headers: {
@@ -110,49 +128,111 @@
                     if (res && res.data && res.data.success) {
                         document.querySelector('h1.row').innerHTML = 'Dashboard';
                         document.querySelector('main').innerHTML = displayDashboard();
+                        document.querySelector('main').innerHTML = getBudget();
+                        //console.log(res);
+
                     }
                 });
             }
-            var dataSource = {
-            datasets: [
-                {
-                    data: [],
-                    backgroundColor: [
-                        '#ffcd56',
-                        '#ff6384',
-                        '#36a2eb',
-                        '#fd6b19',
-                        '#812abc',
-                        '#ef87ba',
-                        '#a7de09',
-                    ],
-                }
-            ],
-            labels: []
-        };
 
-        function createChart() {
-            var ctx = document.getElementById("myChart").getContext("2d");
-            var myPieChart = new Chart(ctx, {
-                type: 'pie',
-                data: dataSource
-            });
-        }
-
-        function getBudget() {
-            axios.get('http://localhost:3000')
-            .then(function (res) {
-                console.log(res);
-                for (var i = 0; i < res.data.length; i++) {
-                    dataSource.datasets[0].data[i] = res.data[i].relatedValue;
-                    dataSource.labels[i] = res.data[i].title;
-                    dataSource.datasets[0].backgroundColor[i] = res.data[i].color;
-                }
-                createChart();
-            });
-        }
-        getBudget();
         </script>
+
+
+
+        <script>
+
+            var dataSource = {
+                datasets: [{
+                    data: [],
+                    backgroundColor: [],
+                }],
+                labels:[]
+            };
+
+            function createChart() {
+                var ctx = document.getElementById("myChart");
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: dataSource,
+                    // {
+                    //     labels: [],
+                    //     datasets: [{
+                    //         label: '# of Votes',
+                    //         data: [12, 19, 3, 5, 2, 3],
+                    //         backgroundColor: [
+                    //             'rgba(255, 99, 132, 0.2)',
+                    //             'rgba(54, 162, 235, 0.2)',
+                    //             'rgba(255, 206, 86, 0.2)',
+                    //             'rgba(75, 192, 192, 0.2)',
+                    //             'rgba(153, 102, 255, 0.2)',
+                    //             'rgba(255, 159, 64, 0.2)'
+                    //         ],
+                    //         borderColor: [
+                    //             'rgba(255, 99, 132, 1)',
+                    //             'rgba(54, 162, 235, 1)',
+                    //             'rgba(255, 206, 86, 1)',
+                    //             'rgba(75, 192, 192, 1)',
+                    //             'rgba(153, 102, 255, 1)',
+                    //             'rgba(255, 159, 64, 1)'
+                    //         ],
+                    //         borderWidth: 1
+                    //     }]
+                    // },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+
+            async function getBudget() {
+                const token = localStorage.getItem('jwt');
+                var result = await axios.post('/api/budget', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then((data) => {
+                    console.log("Data: ");
+                    console.log(data);
+                    //THIS WORKS console.log(data.data[0].username);
+                    // How many items database returned
+                    console.log(data.data.length);
+                    // How many columns in the database
+                    console.log(Object.keys(data.data[0]).length);
+                    // Name of column
+                    console.log(Object.keys(data.data[0])[4]);
+                    // Value in column
+                    console.log(Object.values(data.data[0])[4]);
+                    // Sets label to name of column
+                    dataSource.labels.push(Object.keys(data.data[0])[6]);
+
+                    document.querySelector('main').innerHTML += '<p><canvas id="myChart" width="400" height="400"></canvas></p>';
+                    // for (var i = 0; i < data.data.length; i++) {
+                    //     dataSource.datasets[0].data[i] = result.data.data[i].budgetTotal;
+                    // }
+
+                    console.log("Post Data");
+                });
+                console.log("got here");
+
+                // for (var i = 0; i < result.length; i++) {
+                //     dataSource.datasets[0].data[i] = result.data[i].relatedValue;
+                //     dataSource.labels[i] = result.data[i].title;
+                //     dataSource.datasets[0].backgroundColor[i] = result.data[i].color;
+                // }
+                createChart();
+
+            }
+
+        </script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js" integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg==" crossorigin="anonymous"></script> -->
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg==" crossorigin="anonymous"></script> -->
+
 
 </body>
 
