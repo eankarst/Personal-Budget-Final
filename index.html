@@ -113,6 +113,7 @@
 
             function displayDashboard() {
                 return `
+                <h2>Budget</h2>
                 <h4>Choose a month</h4>
                 <button class="navButton" onclick="getBudget('jan')">January</button>
                 <button class="navButton" onclick="getBudget('feb')">February</button>
@@ -125,13 +126,28 @@
                 <button class="navButton" onclick="getBudget('sep')">September</button>
                 <button class="navButton" onclick="getBudget('oct')">October</button>
                 <button class="navButton" onclick="getBudget('nov')">November</button>
-                <button class="navButton" onclick="getBudget('dec')">December</button>
-                <h3>Add Category</h3>
-                <h4>Enter the name of the category you would like to have a budget for. Entries must be one word, DO NOT USE SPACES.</h4>
-                <div class="row"><label for="category">Category Ex: Rent, Water, etc. </label><input type="text" name="category" id="category"></div><div><button onclick="addCategory()">Add</button></div>
+                <button class="navButton" onclick="getBudget('dec')">December</button>              
                 <h3>Add value</h3>
-                <h4>Enter the category you would like to add a value for, how much money you want to budget, and the three letter abbreviation of the month. To remove an item from your budget set its value to 0. After you have added your values, click the button of the month of the budget you want to view. NOTE: Categories MUST be added before trying to add a value.</h4>
-                <div class="row"><label for="category">Category Ex: Rent, Water, etc. </label><input type="text" name="category2" id="category2"></div><div class="row"><label for="amount">Amount </label><input type="text" name="amount" id="amount"></div><label for="month">Month (Enter 3 lowercase letter abbr Ex: jan, feb) </label><input type="text" name="month" id="month"></div><div><button onclick="addValue()">Add</button></div>
+                <h4>Enter the category you would like to add a value for, how much money you want to budget, and the three letter abbreviation of the month. To remove an item from your budget set its value to 0. After you have added your values, click the button of the month of the budget you want to view.</h4>
+                <div class="row"><label for="category">Category Ex: Rent, Water, etc. </label><input type="text" name="category" id="category"></div><div class="row"><label for="amount">Amount </label><input type="text" name="amount" id="amount"></div><label for="month">Month (Enter 3 lowercase letter abbr Ex: jan, feb) </label><input type="text" name="month" id="month"></div><div><button onclick="addValue()">Add</button></div>
+                <br><br><br>
+                <h2>Expenses</h2>
+                <h4>Choose a month</h4>
+                <button class="navButton" onclick="getExpenses('jan')">January</button>
+                <button class="navButton" onclick="getExpenses('feb')">February</button>
+                <button class="navButton" onclick="getExpenses('mar')">March</button>
+                <button class="navButton" onclick="getExpenses('apr')">April</button>
+                <button class="navButton" onclick="getExpenses('may')">May</button>
+                <button class="navButton" onclick="getExpenses('jun')">June</button>
+                <button class="navButton" onclick="getExpenses('jul')">July</button>
+                <button class="navButton" onclick="getExpenses('aug')">August</button>
+                <button class="navButton" onclick="getExpenses('sep')">September</button>
+                <button class="navButton" onclick="getExpenses('oct')">October</button>
+                <button class="navButton" onclick="getExpenses('nov')">November</button>
+                <button class="navButton" onclick="getExpenses('dec')">December</button>              
+                <h3>Add value</h3>
+                <h4>Enter the category you would like to add a value for, how much money you want as your expense, and the three letter abbreviation of the month. To remove an item from your expenses set its value to 0. After you have added your values, click the button of the month of the expenses you want to view.</h4>
+                <div class="row"><label for="category">Category Ex: Rent, Water, etc. </label><input type="text" name="category2" id="category2"></div><div class="row"><label for="amount">Amount </label><input type="text" name="amount2" id="amount2"></div><label for="month">Month (Enter 3 lowercase letter abbr Ex: jan, feb) </label><input type="text" name="month2" id="month2"></div><div><button onclick="addExpense()">Add</button></div>
                 <button class="navButton" onclick="logout()">Logout</button>
                 `;
             }
@@ -145,25 +161,27 @@
                 const data = {
                     amount: parseInt(document.getElementById('amount').value),
                     month: document.getElementById('month').value,
-                    category: document.getElementById('category2').value,
+                    category: document.getElementById('category').value,
                 };
                 axios.post('/api/addValue', data)
                     .then(res => {
-                        //console.log(res);
                         document.getElementById('amount').value = '';
                         document.getElementById('month').value = '';
-                        document.getElementById('category2').value = '';
+                        document.getElementById('category').value = '';
                     });
             }
 
-            function addCategory() {
+            function addExpense() {
                 const data = {
-                    category: document.getElementById('category').value,
+                    amount: parseInt(document.getElementById('amount2').value),
+                    month: document.getElementById('month2').value,
+                    category: document.getElementById('category2').value,
                 };
-                axios.post('/api/addCategory', data)
+                axios.post('/api/addExpense', data)
                     .then(res => {
-                        //console.log(res);
-                        document.getElementById('category').value = '';
+                        document.getElementById('amount2').value = '';
+                        document.getElementById('month2').value = '';
+                        document.getElementById('category2').value = '';
                     });
             }
 
@@ -185,8 +203,6 @@
             }
 
         </script>
-
-
 
         <script>
 
@@ -243,28 +259,108 @@
                         for (var y = 3; y < Object.keys(data.data[0]).length; y++) {
                             if (Object.values(data.data[i])[2] == month) {
                                 if (Object.values(data.data[i])[y] != null && Object.values(data.data[i])[y] != 0) {
-                                dataSource.labels.push(Object.keys(data.data[0])[y]);
-                                dataSource.datasets[0].data.push(Object.values(data.data[i])[y]);
-                                dataSource.datasets[0].backgroundColor.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+                                    dataSource.labels.push(Object.keys(data.data[0])[y]);
+                                    dataSource.datasets[0].data.push(Object.values(data.data[i])[y]);
+                                    dataSource.datasets[0].backgroundColor.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+                                }
                             }
                         }
+
                     }
 
-                }
-
                     document.querySelector('main').innerHTML += '<p><canvas id="myChart" width="400" height="400"></canvas></p>';
-                // for (var i = 0; i < data.data.length; i++) {
-                //     dataSource.datasets[0].data[i] = result.data.data[i].budgetTotal;
-                // }
+                    // for (var i = 0; i < data.data.length; i++) {
+                    //     dataSource.datasets[0].data[i] = result.data.data[i].budgetTotal;
+                    // }
 
-                console.log("Post Data");
-            });
-            console.log("got here");
-            createChart();
+                    console.log("Post Data");
+                });
+                console.log("got here");
+                createChart();
 
             }
 
         </script>
+
+        <script>
+
+            var dataSource = {
+                datasets: [{
+                    data: [],
+                    backgroundColor: [],
+                }],
+                labels: []
+            };
+
+            function createExpenseChart() {
+                var ctx = document.getElementById("myChart");
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: dataSource,
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+
+            async function getExpenses(month) {
+                const token = localStorage.getItem('jwt');
+                var result = await axios.post('/api/expenses', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then((data) => {
+                    console.log("Data: ");
+                    console.log(data);
+                    //THIS WORKS console.log(data.data[0].username);
+                    // How many items database returned
+                    console.log(data.data.length);
+                    // How many columns in the database
+                    console.log(Object.keys(data.data[0]).length);
+                    // Name of column
+                    console.log(Object.keys(data.data[0])[4]);
+                    // Value in column
+                    console.log(Object.values(data.data[0])[4]);
+                    // Sets label to name of column
+                    //dataSource.labels.push(Object.keys(data.data[0])[6]);
+                    dataSource.labels = [];
+                    dataSource.datasets[0].data = [];
+                    dataSource.datasets[0].backgroundColor = [];
+
+                    for (var i = 0; i < data.data.length; i++) {
+                        for (var y = 3; y < Object.keys(data.data[0]).length; y++) {
+                            if (Object.values(data.data[i])[2] == month) {
+                                if (Object.values(data.data[i])[y] != null && Object.values(data.data[i])[y] != 0) {
+                                    dataSource.labels.push(Object.keys(data.data[0])[y]);
+                                    dataSource.datasets[0].data.push(Object.values(data.data[i])[y]);
+                                    dataSource.datasets[0].backgroundColor.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+                                }
+                            }
+                        }
+
+                    }
+
+                    document.querySelector('main').innerHTML += '<p><canvas id="myChart" width="400" height="400"></canvas></p>';
+                    // for (var i = 0; i < data.data.length; i++) {
+                    //     dataSource.datasets[0].data[i] = result.data.data[i].budgetTotal;
+                    // }
+
+                    console.log("Post Data");
+                });
+                console.log("got here");
+                createExpenseChart();
+
+            }
+
+        </script>
+
+
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js" integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg==" crossorigin="anonymous"></script> -->
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg==" crossorigin="anonymous"></script> -->
 

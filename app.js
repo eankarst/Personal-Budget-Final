@@ -129,6 +129,7 @@ app.post('/api/register', (req, res) => {
                 });
                 console.log("User Registered");               
                 createEmptyBudget(username);
+                createEmptyExpenses(username);
             }
         })
         //db.end;
@@ -161,31 +162,70 @@ function createEmptyBudget(username) {
     console.log("Empty Budget Created.")
 };
 
-app.post('/api/addCategory', (req, res) => {
-    const { category } = req.body;
-    db.query('SELECT ' + category + ' FROM budget', (error, results) => {
-        if(results > 0) {
-            console.log('Category already exists.');
-        } else {
-            db.query('ALTER TABLE budget ADD COLUMN ' + category + ' VARCHAR(255)', (error, results) => {
-                if(error) {
-                    console.log(error);
-                } else {
-                    res.json({
-                        success: true,
-                        err: null
-                    });
-                    console.log("Category added");               
-                }
-            });
-        }
-    });
+function createEmptyExpenses(username) {
+    const name = username;
+    console.log("Got to createEmptyExpenses");
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'jan'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'feb'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'mar'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'apr'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'may'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'jun'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'jul'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'aug'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'sep'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'oct'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'nov'})
+    db.query('INSERT INTO expenses SET ?', {username: name, month: 'dec'})
+    console.log("Empty expenses Created.")
+};
+
+// app.post('/api/addCategory', (req, res) => {
+//     const { category } = req.body;
+//     db.query('SELECT ' + category + ' FROM budget', (error, results) => {
+//         if(results > 0) {
+//             console.log('Category already exists.');
+//         } else {
+//             db.query('ALTER TABLE budget ADD COLUMN ' + category + ' VARCHAR(255)', (error, results) => {
+//                 if(error) {
+//                     console.log(error);
+//                 } else {
+//                     res.json({
+//                         success: true,
+//                         err: null
+//                     });
+//                     console.log("Category added");               
+//                 }
+//             });
+//         }
+//     });
     
-});
+// });
 
 app.post('/api/addValue', (req, res) => {
     const { category, amount, month } = req.body;
+    try {
+    db.query('ALTER TABLE budget ADD COLUMN ' + category + ' VARCHAR(255)', (error, results));
+    } catch (error) {
+        console.log("Duplicate column name.");
+    }
     db.query('UPDATE budget SET ' + category + ' = ? WHERE username = ? AND month = ?', [amount, currentUsername, month], (error, results) => {
+        if(error) {
+            console.log(error);
+        } else {
+            res.json({
+                success: true,
+                err: null
+            });
+            console.log("Value added");               
+        }
+    });
+});
+
+app.post('/api/addExpense', (req, res) => {
+    const { category, amount, month } = req.body;
+    db.query('ALTER TABLE expenses ADD COLUMN ' + category + ' VARCHAR(255)');
+    db.query('UPDATE expenses SET ' + category + ' = ? WHERE username = ? AND month = ?', [amount, currentUsername, month], (error, results) => {
         if(error) {
             console.log(error);
         } else {
@@ -213,14 +253,21 @@ app.post('/api/budget', (req, res) => {
             res.json(results);
         }
     });
-    // var budget = await db.query('SELECT * FROM budget where username = ?', [currentUsername], (error, results) => {
-    //     if(error) {
-    //         console.log(error);
-    //         return;
-    //     }
-    // });
-    //     console.log("Accessing budget table");
-    //     console.log("req.body: " + req.body);
+});
+
+app.post('/api/expenses', (req, res) => {
+    console.log("currentUsername: " + currentUsername);
+    db.query('SELECT * FROM expenses where username = ?', [currentUsername], (error, results) => {
+        if(error) {
+            console.log(error);
+            return;
+        } else {
+            console.log(currentUsername);
+            console.log("Accessing expenses table...");
+            console.log(results);
+            res.json(results);
+        }
+    });
 });
 
 async function userBudget(err, req, res, next) {
