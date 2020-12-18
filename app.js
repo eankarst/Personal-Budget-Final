@@ -128,7 +128,7 @@ app.post('/api/register', (req, res) => {
                     err: null
                 });
                 console.log("User Registered");               
-                //createEmptyBudget(username);
+                createEmptyBudget(username);
             }
         })
         //db.end;
@@ -146,55 +146,41 @@ return res;
 function createEmptyBudget(username) {
     const name = username;
     console.log("Got to createEmptyBudget");
-    db.query('INSERT INTO budget SET ?', {username: name, jan: '0', feb: '0', mar: '0', apr: '0', may: '0', jun: '0', jul: '0', aug: '0', sep: '0', oct: '0', nov: '0', december: '0',}, (error, results) => {
-        if(error) {
-            console.log(error);
-        } else {
-            res.json({
-                success: true,
-                err: null
-            });
-            console.log("Empty Budget Created.")
-        }
-    })
-}
-
-app.post('/api/createEmptyBudget', (req, res )=> {
-    console.log("Got to empty Budget");
-    // const { username } = req.body;
-    // console.log("Username: " + username);
-    db.query('SELECT id FROM users WHERE name = ?', [username], (error, results) => {
-        idOfUser = results[0].id;
-        console.log("UserID: " + idOfUser);
-    });
-    db.query('INSERT INTO budget SET ?', {userID: idOfUser, jan: '0', feb: '0', mar: '0', apr: '0', may: '0', jun: '0', jul: '0', aug: '0', sep: '0', oct: '0', nov: '0', december: '0',}, (error, results) => {
-        if(error) {
-            console.log(error);
-        } else {
-            res.json({
-                success: true,
-                err: null
-            });
-            console.log("Empty Budget Created.")
-        }
-    })
-    return res;
-        
-});
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'jan'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'feb'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'mar'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'apr'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'may'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'jun'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'jul'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'aug'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'sep'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'oct'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'nov'})
+    db.query('INSERT INTO budget SET ?', {username: name, month: 'dec'})
+    console.log("Empty Budget Created.")
+};
 
 app.post('/api/addCategory', (req, res) => {
     const { category } = req.body;
-    db.query('ALTER TABLE budget ADD COLUMN ' + category + ' VARCHAR(255)', (error, results) => {
-        if(error) {
-            console.log(error);
+    db.query('SELECT ' + category + ' FROM budget', (error, results) => {
+        if(results > 0) {
+            console.log('Category already exists.');
         } else {
-            res.json({
-                success: true,
-                err: null
+            db.query('ALTER TABLE budget ADD COLUMN ' + category + ' VARCHAR(255)', (error, results) => {
+                if(error) {
+                    console.log(error);
+                } else {
+                    res.json({
+                        success: true,
+                        err: null
+                    });
+                    console.log("Category added");               
+                }
             });
-            console.log("Category added");               
         }
     });
+    
 });
 
 app.post('/api/addValue', (req, res) => {

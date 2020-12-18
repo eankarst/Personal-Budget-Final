@@ -127,10 +127,18 @@
                 <button class="navButton" onclick="getBudget('nov')">November</button>
                 <button class="navButton" onclick="getBudget('dec')">December</button>
                 <h3>Add Category</h3>
+                <h4>Enter the name of the category you would like to have a budget for. Entries must be one word, DO NOT USE SPACES.</h4>
                 <div class="row"><label for="category">Category Ex: Rent, Water, etc. </label><input type="text" name="category" id="category"></div><div><button onclick="addCategory()">Add</button></div>
                 <h3>Add value</h3>
+                <h4>Enter the category you would like to add a value for, how much money you want to budget, and the three letter abbreviation of the month. To remove an item from your budget set its value to 0. After you have added your values, click the button of the month of the budget you want to view. NOTE: Categories MUST be added before trying to add a value.</h4>
                 <div class="row"><label for="category">Category Ex: Rent, Water, etc. </label><input type="text" name="category2" id="category2"></div><div class="row"><label for="amount">Amount </label><input type="text" name="amount" id="amount"></div><label for="month">Month (Enter 3 lowercase letter abbr Ex: jan, feb) </label><input type="text" name="month" id="month"></div><div><button onclick="addValue()">Add</button></div>
+                <button class="navButton" onclick="logout()">Logout</button>
                 `;
+            }
+
+            function logout() {
+                localStorage.setItem('jwt', '');
+                homeDisplay();
             }
 
             function addValue() {
@@ -144,10 +152,10 @@
                         //console.log(res);
                         document.getElementById('amount').value = '';
                         document.getElementById('month').value = '';
-                        document.getElementById('category2').value = '';                       
+                        document.getElementById('category2').value = '';
                     });
             }
-            
+
             function addCategory() {
                 const data = {
                     category: document.getElementById('category').value,
@@ -155,7 +163,7 @@
                 axios.post('/api/addCategory', data)
                     .then(res => {
                         //console.log(res);
-                        document.getElementById('category').value = '';                    
+                        document.getElementById('category').value = '';
                     });
             }
 
@@ -234,24 +242,25 @@
                     for (var i = 0; i < data.data.length; i++) {
                         for (var y = 3; y < Object.keys(data.data[0]).length; y++) {
                             if (Object.values(data.data[i])[2] == month) {
-                                
+                                if (Object.values(data.data[i])[y] != null && Object.values(data.data[i])[y] != 0) {
                                 dataSource.labels.push(Object.keys(data.data[0])[y]);
                                 dataSource.datasets[0].data.push(Object.values(data.data[i])[y]);
-                                dataSource.datasets[0].backgroundColor.push('#' + Math.floor(Math.random()*16777215).toString(16));
+                                dataSource.datasets[0].backgroundColor.push('#' + Math.floor(Math.random() * 16777215).toString(16));
                             }
                         }
-
                     }
 
-                    document.querySelector('main').innerHTML += '<p><canvas id="myChart" width="400" height="400"></canvas></p>';
-                    // for (var i = 0; i < data.data.length; i++) {
-                    //     dataSource.datasets[0].data[i] = result.data.data[i].budgetTotal;
-                    // }
+                }
 
-                    console.log("Post Data");
-                });
-                console.log("got here");
-                createChart();
+                    document.querySelector('main').innerHTML += '<p><canvas id="myChart" width="400" height="400"></canvas></p>';
+                // for (var i = 0; i < data.data.length; i++) {
+                //     dataSource.datasets[0].data[i] = result.data.data[i].budgetTotal;
+                // }
+
+                console.log("Post Data");
+            });
+            console.log("got here");
+            createChart();
 
             }
 
