@@ -114,8 +114,49 @@
             function displayDashboard() {
                 return `
                 <h4>Choose a month</h4>
-                <button class="navButton" onclick="getBudget()">Show Chart</button>
+                <button class="navButton" onclick="getBudget('jan')">January</button>
+                <button class="navButton" onclick="getBudget('feb')">February</button>
+                <button class="navButton" onclick="getBudget('mar')">March</button>
+                <button class="navButton" onclick="getBudget('apr')">April</button>
+                <button class="navButton" onclick="getBudget('may')">May</button>
+                <button class="navButton" onclick="getBudget('jun')">June</button>
+                <button class="navButton" onclick="getBudget('jul')">July</button>
+                <button class="navButton" onclick="getBudget('aug')">August</button>
+                <button class="navButton" onclick="getBudget('sep')">September</button>
+                <button class="navButton" onclick="getBudget('oct')">October</button>
+                <button class="navButton" onclick="getBudget('nov')">November</button>
+                <button class="navButton" onclick="getBudget('dec')">December</button>
+                <h3>Add Category</h3>
+                <div class="row"><label for="category">Category Ex: Rent, Water, etc. </label><input type="text" name="category" id="category"></div><div><button onclick="addCategory()">Add</button></div>
+                <h3>Add value</h3>
+                <div class="row"><label for="category">Category Ex: Rent, Water, etc. </label><input type="text" name="category2" id="category2"></div><div class="row"><label for="amount">Amount </label><input type="text" name="amount" id="amount"></div><label for="month">Month (Enter 3 lowercase letter abbr Ex: jan, feb) </label><input type="text" name="month" id="month"></div><div><button onclick="addValue()">Add</button></div>
                 `;
+            }
+
+            function addValue() {
+                const data = {
+                    amount: parseInt(document.getElementById('amount').value),
+                    month: document.getElementById('month').value,
+                    category: document.getElementById('category2').value,
+                };
+                axios.post('/api/addValue', data)
+                    .then(res => {
+                        //console.log(res);
+                        document.getElementById('amount').value = '';
+                        document.getElementById('month').value = '';
+                        document.getElementById('category2').value = '';                       
+                    });
+            }
+            
+            function addCategory() {
+                const data = {
+                    category: document.getElementById('category').value,
+                };
+                axios.post('/api/addCategory', data)
+                    .then(res => {
+                        //console.log(res);
+                        document.getElementById('category').value = '';                    
+                    });
             }
 
             async function getDashboard() {
@@ -154,30 +195,6 @@
                 var myChart = new Chart(ctx, {
                     type: 'bar',
                     data: dataSource,
-                    // {
-                    //     labels: [],
-                    //     datasets: [{
-                    //         label: '# of Votes',
-                    //         data: [12, 19, 3, 5, 2, 3],
-                    //         backgroundColor: [
-                    //             'rgba(255, 99, 132, 0.2)',
-                    //             'rgba(54, 162, 235, 0.2)',
-                    //             'rgba(255, 206, 86, 0.2)',
-                    //             'rgba(75, 192, 192, 0.2)',
-                    //             'rgba(153, 102, 255, 0.2)',
-                    //             'rgba(255, 159, 64, 0.2)'
-                    //         ],
-                    //         borderColor: [
-                    //             'rgba(255, 99, 132, 1)',
-                    //             'rgba(54, 162, 235, 1)',
-                    //             'rgba(255, 206, 86, 1)',
-                    //             'rgba(75, 192, 192, 1)',
-                    //             'rgba(153, 102, 255, 1)',
-                    //             'rgba(255, 159, 64, 1)'
-                    //         ],
-                    //         borderWidth: 1
-                    //     }]
-                    // },
                     options: {
                         scales: {
                             yAxes: [{
@@ -190,7 +207,7 @@
                 });
             }
 
-            async function getBudget() {
+            async function getBudget(month) {
                 const token = localStorage.getItem('jwt');
                 var result = await axios.post('/api/budget', {
                     headers: {
@@ -210,10 +227,14 @@
                     console.log(Object.values(data.data[0])[4]);
                     // Sets label to name of column
                     //dataSource.labels.push(Object.keys(data.data[0])[6]);
+                    dataSource.labels = [];
+                    dataSource.datasets[0].data = [];
+                    dataSource.datasets[0].backgroundColor = [];
 
                     for (var i = 0; i < data.data.length; i++) {
                         for (var y = 3; y < Object.keys(data.data[0]).length; y++) {
-                            if (Object.values(data.data[i])[2] == 'jan') {
+                            if (Object.values(data.data[i])[2] == month) {
+                                
                                 dataSource.labels.push(Object.keys(data.data[0])[y]);
                                 dataSource.datasets[0].data.push(Object.values(data.data[i])[y]);
                                 dataSource.datasets[0].backgroundColor.push('#' + Math.floor(Math.random()*16777215).toString(16));
@@ -230,12 +251,6 @@
                     console.log("Post Data");
                 });
                 console.log("got here");
-
-                // for (var i = 0; i < result.length; i++) {
-                //     dataSource.datasets[0].data[i] = result.data[i].relatedValue;
-                //     dataSource.labels[i] = result.data[i].title;
-                //     dataSource.datasets[0].backgroundColor[i] = result.data[i].color;
-                // }
                 createChart();
 
             }

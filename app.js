@@ -182,6 +182,22 @@ app.post('/api/createEmptyBudget', (req, res )=> {
         
 });
 
+app.post('/api/addValue', (req, res) => {
+    const { category, amount, month } = req.body;
+    db.query('UPDATE budget SET ' + category + ' = ? WHERE username = ? AND month = ?', [amount, currentUsername, month], (error, results) => {
+        if(error) {
+            console.log(error);
+        } else {
+            res.json({
+                success: true,
+                err: null
+            });
+            console.log("Value added");               
+            //createEmptyBudget(username);
+        }
+    });
+});
+
 app.post('/api/budget', (req, res) => {
     console.log("currentUsername: " + currentUsername);
     // userBudget();
