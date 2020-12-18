@@ -113,8 +113,8 @@
 
             function displayDashboard() {
                 return `
-                <h2>Test</h2>
-                
+                <h4>Choose a month</h4>
+                <button class="navButton" onclick="getBudget()">Show Chart</button>
                 `;
             }
 
@@ -128,7 +128,7 @@
                     if (res && res.data && res.data.success) {
                         document.querySelector('h1.row').innerHTML = 'Dashboard';
                         document.querySelector('main').innerHTML = displayDashboard();
-                        document.querySelector('main').innerHTML = getBudget();
+                        //document.querySelector('main').innerHTML += getBudget();
                         //console.log(res);
 
                     }
@@ -146,7 +146,7 @@
                     data: [],
                     backgroundColor: [],
                 }],
-                labels:[]
+                labels: []
             };
 
             function createChart() {
@@ -209,7 +209,18 @@
                     // Value in column
                     console.log(Object.values(data.data[0])[4]);
                     // Sets label to name of column
-                    dataSource.labels.push(Object.keys(data.data[0])[6]);
+                    //dataSource.labels.push(Object.keys(data.data[0])[6]);
+
+                    for (var i = 0; i < data.data.length; i++) {
+                        for (var y = 3; y < Object.keys(data.data[0]).length; y++) {
+                            if (Object.values(data.data[i])[2] == 'jan') {
+                                dataSource.labels.push(Object.keys(data.data[0])[y]);
+                                dataSource.datasets[0].data.push(Object.values(data.data[i])[y]);
+                                dataSource.datasets[0].backgroundColor.push('#' + Math.floor(Math.random()*16777215).toString(16));
+                            }
+                        }
+
+                    }
 
                     document.querySelector('main').innerHTML += '<p><canvas id="myChart" width="400" height="400"></canvas></p>';
                     // for (var i = 0; i < data.data.length; i++) {
