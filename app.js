@@ -34,8 +34,8 @@ const db = mysql.createConnection({
     database: 'final'
 });
 
-db.connect( (error) => {
-    if(error) {
+db.connect((error) => {
+    if (error) {
         console.log(error);
     } else {
         console.log("MySQL Connected...")
@@ -51,7 +51,7 @@ app.post('/api/login', (req, res) => {
         const { username, password } = req.body;
         console.log('Username: ' + username)
 
-        if( !username || !password ) {
+        if (!username || !password) {
             console.log('Failed Here 1');
             res.status(400).json({
                 success: false,
@@ -59,39 +59,40 @@ app.post('/api/login', (req, res) => {
             });
         } else {
             db.query('SELECT * FROM users WHERE name = ?', [username], async (error, results) => {
-            if(!results || await password != results[0].password) {
-                console.log('Failed Here 2');
-                res.status(401).json({
-                    success: false,
-                    err: 'Username or password is incorrect'
-                });
-            } else {
-                console.log('Got Here 3');
-                const id = results[0].id;
-                const token = jwt.sign({ id }, secretKey, { expiresIn: '7d' });
-                console.log('Got Here 4');
-                currentUsername = username;
-                res.status(200).json({
-                    success: true,
-                    err: null,
-                    token
-                });
-                console.log('Got Here 5');
-            }
-        })}
+                if (!results || await password != results[0].password) {
+                    console.log('Failed Here 2');
+                    res.status(401).json({
+                        success: false,
+                        err: 'Username or password is incorrect'
+                    });
+                } else {
+                    console.log('Got Here 3');
+                    const id = results[0].id;
+                    const token = jwt.sign({ id }, secretKey, { expiresIn: '7d' });
+                    console.log('Got Here 4');
+                    currentUsername = username;
+                    res.status(200).json({
+                        success: true,
+                        err: null,
+                        token
+                    });
+                    console.log('Got Here 5');
+                }
+            })
+        }
 
-        
+
     } catch (error) {
         console.log(error);
     }
-    
+
 });
 
 app.post('/api/register', (req, res) => {
     const { username, email, password } = req.body;
     console.log(email)
     db.query('SELECT email FROM users WHERE email = ?', [email], (error, results) => {
-        if(error) {
+        if (error) {
             console.log(error);
             return;
             //db.end;
@@ -102,81 +103,81 @@ app.post('/api/register', (req, res) => {
             });
             console.log(res);
             console.log('Email has already been registered');
-            return;         
+            return;
             //db.end;
         } else {
-    db.query('SELECT name FROM users WHERE name = ?', [username], (error, results) => {
-        if(error) {
-            console.log(error);
-            //db.end;
-        } else if (results.length > 0) {
-            res.status(400).json({
-                success: false,
-                err: 'Username has already been registered.'
-            });
-            console.log(res);
-            console.log('Username has already been registered');        
-            //db.end;
-        } else {
-        //db.end;
-        db.query('INSERT INTO users SET ?', {name: username, email: email, password: password}, (error, results) => {
-            if(error) {
-                console.log(error);
-            } else {
-                res.json({
-                    success: true,
-                    err: null
-                });
-                console.log("User Registered");               
-                createEmptyBudget(username);
-                createEmptyExpenses(username);
-            }
-        })
-        //db.end;
-        console.log("State: " +  db.state)
-    }
-    
-});
-        }
-        });
+            db.query('SELECT name FROM users WHERE name = ?', [username], (error, results) => {
+                if (error) {
+                    console.log(error);
+                    //db.end;
+                } else if (results.length > 0) {
+                    res.status(400).json({
+                        success: false,
+                        err: 'Username has already been registered.'
+                    });
+                    console.log(res);
+                    console.log('Username has already been registered');
+                    //db.end;
+                } else {
+                    //db.end;
+                    db.query('INSERT INTO users SET ?', { name: username, email: email, password: password }, (error, results) => {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            res.json({
+                                success: true,
+                                err: null
+                            });
+                            console.log("User Registered");
+                            createEmptyBudget(username);
+                            createEmptyExpenses(username);
+                        }
+                    })
+                    //db.end;
+                    console.log("State: " + db.state)
+                }
 
-return res;
+            });
+        }
+    });
+
+    return res;
 
 });
 
 function createEmptyBudget(username) {
     const name = username;
     console.log("Got to createEmptyBudget");
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'jan'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'feb'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'mar'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'apr'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'may'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'jun'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'jul'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'aug'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'sep'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'oct'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'nov'})
-    db.query('INSERT INTO budget SET ?', {username: name, month: 'dec'})
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'jan' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'feb' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'mar' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'apr' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'may' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'jun' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'jul' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'aug' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'sep' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'oct' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'nov' })
+    db.query('INSERT INTO budget SET ?', { username: name, month: 'dec' })
     console.log("Empty Budget Created.")
 };
 
 function createEmptyExpenses(username) {
     const name = username;
     console.log("Got to createEmptyExpenses");
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'jan'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'feb'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'mar'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'apr'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'may'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'jun'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'jul'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'aug'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'sep'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'oct'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'nov'})
-    db.query('INSERT INTO expenses SET ?', {username: name, month: 'dec'})
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'jan' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'feb' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'mar' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'apr' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'may' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'jun' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'jul' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'aug' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'sep' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'oct' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'nov' })
+    db.query('INSERT INTO expenses SET ?', { username: name, month: 'dec' })
     console.log("Empty expenses Created.")
 };
 
@@ -199,41 +200,37 @@ function createEmptyExpenses(username) {
 //             });
 //         }
 //     });
-    
+
 // });
 
 app.post('/api/addValue', (req, res) => {
     const { category, amount, month } = req.body;
-    try {
-    db.query('ALTER TABLE budget ADD COLUMN ' + category + ' VARCHAR(255)', (error, results));
-    } catch (error) {
-        console.log("Duplicate column name.");
-    }
+    db.query('ALTER TABLE budget ADD COLUMN IF NOT EXISTS ' + category + ' VARCHAR(255)');
     db.query('UPDATE budget SET ' + category + ' = ? WHERE username = ? AND month = ?', [amount, currentUsername, month], (error, results) => {
-        if(error) {
+        if (error) {
             console.log(error);
         } else {
             res.json({
                 success: true,
                 err: null
             });
-            console.log("Value added");               
+            console.log("Value added");
         }
     });
 });
 
 app.post('/api/addExpense', (req, res) => {
     const { category, amount, month } = req.body;
-    db.query('ALTER TABLE expenses ADD COLUMN ' + category + ' VARCHAR(255)');
+    db.query('ALTER TABLE expenses ADD COLUMN IF NOT EXISTS ' + category + ' VARCHAR(255)');
     db.query('UPDATE expenses SET ' + category + ' = ? WHERE username = ? AND month = ?', [amount, currentUsername, month], (error, results) => {
-        if(error) {
+        if (error) {
             console.log(error);
         } else {
             res.json({
                 success: true,
                 err: null
             });
-            console.log("Value added");               
+            console.log("Value added");
         }
     });
 });
@@ -243,7 +240,7 @@ app.post('/api/budget', (req, res) => {
     // userBudget();
     // console.log(res.json);
     db.query('SELECT * FROM budget where username = ?', [currentUsername], (error, results) => {
-        if(error) {
+        if (error) {
             console.log(error);
             return;
         } else {
@@ -258,7 +255,7 @@ app.post('/api/budget', (req, res) => {
 app.post('/api/expenses', (req, res) => {
     console.log("currentUsername: " + currentUsername);
     db.query('SELECT * FROM expenses where username = ?', [currentUsername], (error, results) => {
-        if(error) {
+        if (error) {
             console.log(error);
             return;
         } else {
@@ -272,7 +269,7 @@ app.post('/api/expenses', (req, res) => {
 
 async function userBudget(err, req, res, next) {
     var budget = await db.query('SELECT * FROM budget where username = ?', [currentUsername], (error, results) => {
-        if(error) {
+        if (error) {
             console.log(error);
             return;
         } else {
@@ -282,7 +279,7 @@ async function userBudget(err, req, res, next) {
             return results;
         }
     });
-    
+
 };
 
 app.get('/api/dashboard', jwtMW, (req, res) => {
