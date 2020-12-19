@@ -34,14 +34,8 @@
         <h1 class="row">Welcome!</h1>
 
         <main>
-
             <p>Personal Budget Manager is the best tool to create, track, and manage your personal budget!</p>
             <p>Login or register for free to get started!</p>
-
-
-
-
-
         </main>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"
@@ -77,16 +71,10 @@
                 axios.post('/api/register', data)
                     .then(res => {
                         if (res.status == 200) {
-                            console.log('Success')
-                            // axios.post('/api/createEmptyBudget', data).then(res => {
                             document.getElementById('username').value = '';
                             document.getElementById('email').value = '';
                             document.getElementById('password').value = '';
                             loginDisplay();
-                            //})
-
-
-
                         } else {
                             console.log("There was an error.");
                         }
@@ -100,7 +88,6 @@
                 };
                 axios.post('/api/login', data)
                     .then(res => {
-                        //console.log(res);
                         document.getElementById('username').value = '';
                         document.getElementById('password').value = '';
                         if (res && res.data && res.data.success) {
@@ -152,8 +139,7 @@
                 <h2>Year Budget</h2>
                 <h3>Get an overview of your budget for the whole year</h3>
                 <button class="navButton" onclick="getYearBudget()">Update</button>
-                <div class="chartDiv" id="myYearChartPlaceHolder"></div>
-                
+                <div class="chartDiv" id="myYearChartPlaceHolder"></div>                
                 <button class="navButton" onclick="logout()">Logout</button>          
                 `;
             }
@@ -201,9 +187,6 @@
                     if (res && res.data && res.data.success) {
                         document.querySelector('h1.row').innerHTML = 'Dashboard';
                         document.querySelector('main').innerHTML = displayDashboard();
-                        //document.querySelector('main').innerHTML += getBudget();
-                        //console.log(res);
-
                     }
                 });
             }
@@ -227,8 +210,8 @@
                     data: dataSource,
                     options: {
                         legend: {
-        display: false
-    },
+                            display: false
+                        },
                         scales: {
                             yAxes: [{
                                 ticks: {
@@ -247,19 +230,6 @@
                         'Authorization': `Bearer ${token}`
                     }
                 }).then((data) => {
-                    console.log("Data: ");
-                    console.log(data);
-                    //THIS WORKS console.log(data.data[0].username);
-                    // How many items database returned
-                    console.log(data.data.length);
-                    // How many columns in the database
-                    console.log(Object.keys(data.data[0]).length);
-                    // Name of column
-                    console.log(Object.keys(data.data[0])[4]);
-                    // Value in column
-                    console.log(Object.values(data.data[0])[4]);
-                    // Sets label to name of column
-                    //dataSource.labels.push(Object.keys(data.data[0])[6]);
                     dataSource.labels = [];
                     dataSource.datasets[0].data = [];
                     dataSource.datasets[0].backgroundColor = [];
@@ -269,32 +239,24 @@
                     var months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
                     var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-
                     for (var i = 0; i < 12; i++) {
-                            for (var y = 3; y < Object.keys(data.data[0]).length; y++) {                          
-                                if (Object.values(data.data[i])[2] == months[i]) {
-                                    if (Object.values(data.data[i])[y] != null) {
-                                        total += parseInt(Object.values(data.data[i])[y]);
-                                        console.log(total);
-                                    }
+                        for (var y = 3; y < Object.keys(data.data[0]).length; y++) {
+                            if (Object.values(data.data[i])[2] == months[i]) {
+                                if (Object.values(data.data[i])[y] != null) {
+                                    total += parseInt(Object.values(data.data[i])[y]);
+                                    console.log(total);
                                 }
-                                
-                            
-                            
+                            }
                         }
                         dataSource.labels.push(monthNames[i]);
-                            dataSource.datasets[0].data.push(total);
-                            dataSource.datasets[0].backgroundColor.push('#' + Math.floor(Math.random() * 16777215).toString(16));
-                            total = 0;
+                        dataSource.datasets[0].data.push(total);
+                        dataSource.datasets[0].backgroundColor.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+                        total = 0;
                     }
 
                     document.getElementById('myYearChartPlaceHolder').innerHTML += '<p><canvas id="myYearChart" width="50%" height="50%"></canvas></p>';
-
-                    console.log("Post Data");
                 });
-                console.log("got here");
                 createYearChart();
-
             }
 
         </script>
@@ -316,8 +278,8 @@
                     data: dataSource,
                     options: {
                         legend: {
-        display: false
-    },
+                            display: false
+                        },
                         scales: {
                             yAxes: [{
                                 ticks: {
@@ -336,19 +298,6 @@
                         'Authorization': `Bearer ${token}`
                     }
                 }).then((data) => {
-                    console.log("Data: ");
-                    console.log(data);
-                    //THIS WORKS console.log(data.data[0].username);
-                    // How many items database returned
-                    console.log(data.data.length);
-                    // How many columns in the database
-                    console.log(Object.keys(data.data[0]).length);
-                    // Name of column
-                    console.log(Object.keys(data.data[0])[4]);
-                    // Value in column
-                    console.log(Object.values(data.data[0])[4]);
-                    // Sets label to name of column
-                    //dataSource.labels.push(Object.keys(data.data[0])[6]);
                     dataSource.labels = [];
                     dataSource.datasets[0].data = [];
                     dataSource.datasets[0].backgroundColor = [];
@@ -363,17 +312,10 @@
                                 }
                             }
                         }
-
                     }
 
                     document.getElementById('myExpensesChartPlaceHolder').innerHTML += '<p><canvas id="myExpensesChart" width="400" height="400"></canvas></p>';
-                    // for (var i = 0; i < data.data.length; i++) {
-                    //     dataSource.datasets[0].data[i] = result.data.data[i].budgetTotal;
-                    // }
-
-                    console.log("Post Data");
                 });
-                console.log("got here");
                 createExpenseChart();
 
             }
@@ -398,8 +340,8 @@
                     data: dataSource,
                     options: {
                         legend: {
-        display: false
-    },
+                            display: false
+                        },
                         scales: {
                             yAxes: [{
                                 ticks: {
@@ -407,7 +349,7 @@
                                 }
                             }]
                         }
-                        
+
                     }
                 });
             }
@@ -419,19 +361,6 @@
                         'Authorization': `Bearer ${token}`
                     }
                 }).then((data) => {
-                    console.log("Data: ");
-                    console.log(data);
-                    //THIS WORKS console.log(data.data[0].username);
-                    // How many items database returned
-                    console.log(data.data.length);
-                    // How many columns in the database
-                    console.log(Object.keys(data.data[0]).length);
-                    // Name of column
-                    console.log(Object.keys(data.data[0])[4]);
-                    // Value in column
-                    console.log(Object.values(data.data[0])[4]);
-                    // Sets label to name of column
-                    //dataSource.labels.push(Object.keys(data.data[0])[6]);
                     dataSource.labels = [];
                     dataSource.datasets[0].data = [];
                     dataSource.datasets[0].backgroundColor = [];
@@ -450,23 +379,12 @@
                     }
 
                     document.getElementById('myChartPlaceHolder').innerHTML += '<p><canvas id="myChart" width="100" height="100"></canvas></p>';
-                    // for (var i = 0; i < data.data.length; i++) {
-                    //     dataSource.datasets[0].data[i] = result.data.data[i].budgetTotal;
-                    // }
-
-                    console.log("Post Data");
                 });
-                console.log("got here");
                 createChart();
 
             }
 
         </script>
-
-
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js" integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg==" crossorigin="anonymous"></script> -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg==" crossorigin="anonymous"></script> -->
-
 
 </body>
 

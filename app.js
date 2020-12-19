@@ -52,7 +52,6 @@ app.post('/api/login', (req, res) => {
         console.log('Username: ' + username)
 
         if (!username || !password) {
-            console.log('Failed Here 1');
             res.status(400).json({
                 success: false,
                 err: 'Please enter username and password.'
@@ -60,23 +59,19 @@ app.post('/api/login', (req, res) => {
         } else {
             db.query('SELECT * FROM users WHERE name = ?', [username], async (error, results) => {
                 if (!results || await password != results[0].password) {
-                    console.log('Failed Here 2');
                     res.status(401).json({
                         success: false,
                         err: 'Username or password is incorrect'
                     });
                 } else {
-                    console.log('Got Here 3');
                     const id = results[0].id;
                     const token = jwt.sign({ id }, secretKey, { expiresIn: '7d' });
-                    console.log('Got Here 4');
                     currentUsername = username;
                     res.status(200).json({
                         success: true,
                         err: null,
                         token
                     });
-                    console.log('Got Here 5');
                 }
             })
         }
@@ -95,31 +90,24 @@ app.post('/api/register', (req, res) => {
         if (error) {
             console.log(error);
             return;
-            //db.end;
         } else if (results.length > 0) {
             res.status(400).json({
                 success: false,
                 err: 'Email has already been registered.'
             });
-            console.log(res);
             console.log('Email has already been registered');
             return;
-            //db.end;
         } else {
             db.query('SELECT name FROM users WHERE name = ?', [username], (error, results) => {
                 if (error) {
                     console.log(error);
-                    //db.end;
                 } else if (results.length > 0) {
                     res.status(400).json({
                         success: false,
                         err: 'Username has already been registered.'
                     });
-                    console.log(res);
                     console.log('Username has already been registered');
-                    //db.end;
                 } else {
-                    //db.end;
                     db.query('INSERT INTO users SET ?', { name: username, email: email, password: password }, (error, results) => {
                         if (error) {
                             console.log(error);
@@ -133,7 +121,6 @@ app.post('/api/register', (req, res) => {
                             createEmptyExpenses(username);
                         }
                     })
-                    //db.end;
                     console.log("State: " + db.state)
                 }
 
@@ -181,28 +168,6 @@ function createEmptyExpenses(username) {
     console.log("Empty expenses Created.")
 };
 
-// app.post('/api/addCategory', (req, res) => {
-//     const { category } = req.body;
-//     db.query('SELECT ' + category + ' FROM budget', (error, results) => {
-//         if(results > 0) {
-//             console.log('Category already exists.');
-//         } else {
-//             db.query('ALTER TABLE budget ADD COLUMN ' + category + ' VARCHAR(255)', (error, results) => {
-//                 if(error) {
-//                     console.log(error);
-//                 } else {
-//                     res.json({
-//                         success: true,
-//                         err: null
-//                     });
-//                     console.log("Category added");               
-//                 }
-//             });
-//         }
-//     });
-
-// });
-
 app.post('/api/addValue', (req, res) => {
     const { category, amount, month } = req.body;
     db.query('ALTER TABLE budget ADD COLUMN IF NOT EXISTS ' + category + ' VARCHAR(255)');
@@ -236,17 +201,12 @@ app.post('/api/addExpense', (req, res) => {
 });
 
 app.post('/api/budget', (req, res) => {
-    console.log("currentUsername: " + currentUsername);
-    // userBudget();
-    // console.log(res.json);
     db.query('SELECT * FROM budget where username = ?', [currentUsername], (error, results) => {
         if (error) {
             console.log(error);
             return;
         } else {
-            console.log(currentUsername);
             console.log("Accessing budget table...");
-            console.log(results);
             res.json(results);
         }
     });
@@ -259,28 +219,11 @@ app.post('/api/expenses', (req, res) => {
             console.log(error);
             return;
         } else {
-            console.log(currentUsername);
             console.log("Accessing expenses table...");
-            console.log(results);
             res.json(results);
         }
     });
 });
-
-async function userBudget(err, req, res, next) {
-    var budget = await db.query('SELECT * FROM budget where username = ?', [currentUsername], (error, results) => {
-        if (error) {
-            console.log(error);
-            return;
-        } else {
-            console.log(currentUsername);
-            console.log("Accessing budget table...");
-            console.log(results);
-            return results;
-        }
-    });
-
-};
 
 app.get('/api/dashboard', jwtMW, (req, res) => {
     res.json({
@@ -305,34 +248,3 @@ app.use(function (err, req, res, next) {
 app.listen(3000, () => {
     console.log("Server started on port 3000")
 });
-
-//THIS WORKS
-// app.post('/api/register', async (req, res) => {
-//     const { username, email, password } = req.body;
-//     console.log(email)
-//     db.query('SELECT email FROM users WHERE email = ?', [email], (error, results) => {
-//         if(error) {
-//             console.log(error);
-//             return res.status(400).render({
-//                 message: 'Error'
-//             })
-//             //db.end;
-//         } else if (results.length > 0) {
-//             console.log('Email has already been registered');
-//             return res.status(400).send('/api/register');           
-//             //db.end;
-//         } else {
-//             //db.end;
-//             db.query('INSERT INTO users SET ?', {name: username, email: email, password: password}, (error, results) => {
-//                 if(error) {
-//                     console.log(error);
-//                 } else {
-//                     console.log("User Registered");
-//                 }
-//             })
-//             //db.end;
-//             console.log("State: " +  db.state)
-//         }
-//     })
-// return;
-// });
