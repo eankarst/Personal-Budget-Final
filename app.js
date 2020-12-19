@@ -18,8 +18,8 @@ var currentUsername = '';
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.setHeader('Access-Control-Allow-Origin', 'http://157.245.210.68:3000');
-    res.setHeader('Access-Control-Allow-Origin', 'http://157.245.210.68:3000/');
+    // res.setHeader('Access-Control-Allow-Origin', 'http://157.245.210.68:3000');
+    // res.setHeader('Access-Control-Allow-Origin', 'http://157.245.210.68:3000/');
     res.setHeader('Access-Control-Allow-Headers', 'Content-type, Authorization');
     next();
 });
